@@ -1,39 +1,48 @@
-# library — 已筛选视频仓库
+# 徐嘉烁猎奇视频库
 
-这个目录是**独立 git 仓库**，存放通过去重校验的猎奇视频。
+> 本仓库**只存放视频文件，不存放任何代码**。
+> 网页前端代码与筛选脚本不在这个仓库里。
+
+## 用途
+
+- 猎奇视频的原片备份，带完整提交历史
+- 作为 Supabase Storage 的源料：本地筛选通过后，再同步到 Supabase 供网页播放
+- 任何人 clone 下来都能拿到原始文件
+
+## 目录
 
 ```
-library/
-├── videos/          视频本体（每个文件已通过 SHA-256 去重）
-├── .dedupe/         哈希索引缓存（本地，已 gitignore，可随时重建）
-├── .gitignore
-└── README.md
+videos/     视频本体
 ```
 
-## 视频是怎么进来的
+文件名保持创作时的原名，不做重命名。
 
-由 `tools/ingest.py` 从 `../inbox/` 移入。手动拖进来也没问题，
-下次跑 `ingest.py` 时会自动为它补算哈希并写进索引。
+## 收录规则
 
-## 提交
+视频进入本仓库前，必须通过本地去重校验：
 
-```powershell
-python ..\tools\publish.py              # 只提交到本地 git
-python ..\tools\publish.py --push       # 提交并推到远端
-```
+- 全文件 SHA-256 与库内已有文件比对
+- 内容完全相同 -> 判定重复，不进库
+- 内容不同 -> 入库
+
+换文件名不改内容，会被判为重复；重新导出导致字节变化，会被判为新片。
 
 ## 关于大文件
 
-视频体积大，git 仓库会涨得很快。如果总量预计超过几百 MB，
-建议接入 Git LFS（`.gitattributes` 已预置规则，取消注释即可启用）：
+GitHub 单个文件硬上限 **100 MB**，超过会被拒绝推送。
+
+如果单个视频超过 100 MB，需要启用 Git LFS：
 
 ```powershell
 git lfs install
-git lfs track "videos/**/*.mp4" "videos/**/*.mkv" "videos/**/*.mov"
+git lfs track "videos/**"
 git add .gitattributes
 ```
 
-## 索引文件
+注意 GitHub 免费额度下 LFS 只有 1 GB 存储和 1 GB 月流量，
+视频量大时更适合把原片放 Supabase Storage，本仓库只留小文件或元数据。
 
-`.dedupe/index.json` 记录每个视频的 `sha256 / size / mtime`。
-删掉它不会丢数据——下次运行会重新计算，只是慢一点。
+## 与网页的关系
+
+网页部署在 Vercel，视频与元数据由 Supabase 提供，本仓库不作为线上分发源。
+本仓库是**归档与备份**，不是 CDN。
