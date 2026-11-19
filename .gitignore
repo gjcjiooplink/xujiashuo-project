@@ -1,6 +1,9 @@
 # 哈希索引是本地缓存，可由视频文件重建，不进版本库
 .dedupe/
 
+# 转码产物，仅用于线上分发；原始 HEVC 素材在 videos/
+videos-h264/
+
 # 系统垃圾
 Thumbs.db
 desktop.ini
