@@ -1,0 +1,12 @@
+# 哈希索引是本地缓存，可由视频文件重建，不进版本库
+.dedupe/
+
+# 系统垃圾
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 未完成的传输
+*.part
+*.tmp
+*.crdownload
